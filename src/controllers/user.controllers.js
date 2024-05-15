@@ -238,7 +238,7 @@ const updeteAccountDetails = asyncHandler(async (req, res) => {
   return res.status(200).json(new ApiResponse(200, "Account updated"));
 });
 const updateUserAvatar = asyncHandler(async (req, res) => {
-  const avatarLocalpath = req.files?.avatar[0].path;
+  const avatarLocalpath = req.file?.path;
   const previousImage = await req.user?.avatar;
   // console.log(previousImage);
   const imagePublicId = previousImage.split("/").pop().split(".")[0];
@@ -265,7 +265,7 @@ const updateUserAvatar = asyncHandler(async (req, res) => {
   return res.status(200).json(new ApiResponse(200, "Avatar image updated"));
 });
 const updateUserCoverImage = asyncHandler(async (req, res) => {
-  const coverImageLocalpath = req.files?.coverImage[0].path;
+  const coverImageLocalpath = req.file?.path;
   const previousImage = await req.user?.coverImage;
   // console.log(previousImage);
   const imagePublicId = previousImage.split("/").pop().split(".")[0];
