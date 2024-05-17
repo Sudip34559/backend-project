@@ -2,11 +2,12 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/apiArror.js";
 import { User } from "../models/user.models.js";
 import { uploadOnCloudinery } from "../utils/cloudinary.js";
-import { ApiResponse } from "../utils/apiResponse.js";
+import { ApiResponse } from "../utils/ApiResponse.js";
 import jwt from "jsonwebtoken";
 import fs from "fs";
 import { v2 as cloudinary } from "cloudinary";
 import mongoose from "mongoose";
+import { log } from "console";
 
 const generateAccessAndRefereshTokens = async (userId) => {
   try {
@@ -62,6 +63,7 @@ const registerUser = asyncHandler(async (req, res) => {
   // upload them to cloudinary, avatar
   const avatar = await uploadOnCloudinery(avatarLocalPath);
   const coverImage = await uploadOnCloudinery(coverImageLocalPath);
+  console.log(avatar);
   if (!avatar) {
     throw new ApiError(400, "Avatar image is required");
   }
