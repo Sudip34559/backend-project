@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
-import { Comment } from "../models/comment.model.js";
-import { ApiError } from "../utils/ApiError.js";
+import { Comments } from "../models/comment.models.js";
+import { ApiError } from "../utils/apiArror.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { User } from "../models/user.models.js";
@@ -13,21 +13,21 @@ const getVideoComments = asyncHandler(async (req, res) => {
 
 const addComment = asyncHandler(async (req, res) => {
   const { videoId } = req.params;
-  console.log(videoId);
+  // console.log(videoId);
   if (!mongoose.Types.ObjectId.isValid(videoId)) {
     throw new ApiError(400, "Video Id is missing");
   }
   const { content } = req.body;
-  console.log(content);
+  // console.log(content);
   if (!content) {
     throw new ApiError(400, "Content is missing");
   }
   const user = await User.findById(req.user._id);
-  console.log(user);
+  // console.log(user);
   if (!user) {
     throw new ApiError(400, "User does not exist");
   }
-  const comment = await Comment.create({
+  const comment = await Comments.create({
     content,
     video: videoId,
     owner: req.user._id,
@@ -39,6 +39,7 @@ const addComment = asyncHandler(async (req, res) => {
 
 const updateComment = asyncHandler(async (req, res) => {
   const { newContent } = req.body;
+  console.log(newContent);
   if (!newContent) {
     throw new ApiError(400, "Content is missing");
   }
@@ -50,7 +51,7 @@ const updateComment = asyncHandler(async (req, res) => {
   if (!user) {
     throw new ApiError(400, "User does not exist");
   }
-  const comment = await Comment.findByIdAndUpdate(
+  const comment = await Comments.findByIdAndUpdate(
     commentId,
     {
       $set: {
@@ -59,6 +60,9 @@ const updateComment = asyncHandler(async (req, res) => {
     },
     { new: true }
   );
+  if (!comment) {
+    throw new ApiError(400, "Comment does not exist");
+  }
   return res.status(200).json(new ApiResponse(200, "Comment is updated"));
 });
 
@@ -71,11 +75,11 @@ const deleteComment = asyncHandler(async (req, res) => {
   if (!user) {
     throw new ApiError(400, "User does not exist");
   }
-  const comment = await Comment.findById(commentId);
+  const comment = await Comments.findById(commentId);
   if (!comment) {
     throw new ApiError(400, "Comment does not exist");
   }
-  await Comment.findByIdAndDelete(commentId);
+  await Comments.findByIdAndDelete(commentId);
   return res.status(200).json(new ApiResponse(200, "Comment is deleted"));
 });
 

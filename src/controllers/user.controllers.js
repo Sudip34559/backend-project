@@ -4,11 +4,8 @@ import { User } from "../models/user.models.js";
 import { uploadOnCloudinery } from "../utils/cloudinary.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import jwt from "jsonwebtoken";
-import fs from "fs";
 import { v2 as cloudinary } from "cloudinary";
 import mongoose from "mongoose";
-import { log } from "console";
-
 const generateAccessAndRefereshTokens = async (userId) => {
   try {
     const user = await User.findById(userId);
