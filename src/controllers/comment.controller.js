@@ -13,14 +13,17 @@ const getVideoComments = asyncHandler(async (req, res) => {
 
 const addComment = asyncHandler(async (req, res) => {
   const { videoId } = req.params;
+  console.log(videoId);
   if (!mongoose.Types.ObjectId.isValid(videoId)) {
     throw new ApiError(400, "Video Id is missing");
   }
   const { content } = req.body;
+  console.log(content);
   if (!content) {
     throw new ApiError(400, "Content is missing");
   }
   const user = await User.findById(req.user._id);
+  console.log(user);
   if (!user) {
     throw new ApiError(400, "User does not exist");
   }

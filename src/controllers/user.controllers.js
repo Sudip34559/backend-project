@@ -63,7 +63,6 @@ const registerUser = asyncHandler(async (req, res) => {
   // upload them to cloudinary, avatar
   const avatar = await uploadOnCloudinery(avatarLocalPath);
   const coverImage = await uploadOnCloudinery(coverImageLocalPath);
-  console.log(avatar);
   if (!avatar) {
     throw new ApiError(400, "Avatar image is required");
   }
@@ -241,15 +240,15 @@ const updeteAccountDetails = asyncHandler(async (req, res) => {
 });
 const updateUserAvatar = asyncHandler(async (req, res) => {
   const avatarLocalpath = req.file?.path;
+  if (!avatarLocalpath) {
+    throw new ApiError(400, "Avatar is missing");
+  }
   const previousImage = await req.user?.avatar;
   // console.log(previousImage);
   const imagePublicId = previousImage.split("/").pop().split(".")[0];
   // console.log(imagePublicId);
   await cloudinary.uploader.destroy(imagePublicId);
 
-  if (!avatarLocalpath) {
-    throw new ApiError(400, "Avatar is missing");
-  }
   const avatar = await uploadOnCloudinery(avatarLocalpath);
   if (!avatar.url) {
     throw new ApiError(400, "Error while uploading avatar");

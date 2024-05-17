@@ -35,6 +35,12 @@ const videoSchema = new Schema(
       ref: "User",
       required: true,
     },
+    comments: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Comments",
+      },
+    ],
   },
   { timestamps: true }
 );
