@@ -73,7 +73,12 @@ const addVideoToPlaylist = asyncHandler(async (req, res) => {
   if (!video) {
     throw new ApiError(400, "Video not found");
   }
+  if (playlist.videos.includes(videoId)) {
+    throw new ApiError(400, "Video already exists in playlist");
+  }
+
   playlist.videos.push(videoId);
+  console.log(playlist.videos);
   await playlist.save({ validateBeforeSave: false });
 
   return res
@@ -101,6 +106,8 @@ const removeVideoFromPlaylist = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Video not found");
   }
   playlist.videos.pull(videoId);
+  console.log(playlist.videos);
+
   await playlist.save({ validateBeforeSave: false });
   return res
     .status(200)
@@ -119,13 +126,39 @@ const removeVideoFromPlaylist = asyncHandler(async (req, res) => {
 
 const deletePlaylist = asyncHandler(async (req, res) => {
   const { playlistId } = req.params;
-  // TODO: delete playlist
+  if (!isValidObjectId(playlistId)) {
+    throw new ApiError(400, "Playlist Id is missing");
+  }
+  const playlist = await Playlists.findByIdAndDelete(playlistId);
+  if (!playlist) {
+    throw new ApiError(400, "Playlist does not exist");
+  }
+  return res
+    .status(200)
+    .json(new ApiResponse(200, {}, "playlist deleted successfully"));
 });
 
 const updatePlaylist = asyncHandler(async (req, res) => {
   const { playlistId } = req.params;
   const { name, description } = req.body;
-  //TODO: update playlist
+
+  if (!isValidObjectId(playlistId)) {
+    throw new ApiError(400, "Playlist Id is missing");
+  }
+  if (!name || !description) {
+    throw new ApiError(400, "name and description are required");
+  }
+  const playlist = await Playlists.findByIdAndUpdate(
+    playlistId,
+    {
+      $set: {
+        name,
+        description,
+      },
+    },
+    { new: true }
+  );
+  return res.status(200).json(new ApiResponse(200, "Playlist updated"));
 });
 
 export {
