@@ -17,11 +17,11 @@ const publishAVideo = asyncHandler(async (req, res) => {
   if (!title || !description) {
     throw new ApiError(400, "Title and description must be provided");
   }
-  // console.log(req.files);
+  console.log(req.files);
 
   const videoFilePath = req.files?.videoFile[0].path;
   const thumbnailPath = req.files?.thumbnail[0].path;
-  // console.log(videoFilePath, thumbnailPath);
+  console.log(videoFilePath, thumbnailPath);
 
   if (!videoFilePath || !thumbnailPath) {
     throw new ApiError(400, "vedio and thumbnail must be provided");
