@@ -9,6 +9,26 @@ const getVideoComments = asyncHandler(async (req, res) => {
   //TODO: get all comments for a video
   const { videoId } = req.params;
   const { page = 1, limit = 10 } = req.query;
+  const pageNumber = Number(page);
+  const limitNumber = Number(limit);
+  const skip = (pageNumber - 1) * limitNumber;
+  const comments = await Comments.find({ video: videoId })
+    .limit(limitNumber)
+    .skip(skip);
+  const allComments = await Comments.find({ video: videoId });
+
+  return res.status(200).json(
+    new ApiResponse(
+      200,
+      {
+        comments: comments,
+        totalPages: Math.ceil(allComments.length / limitNumber),
+        currentPage: pageNumber,
+        totalComments: allComments.length,
+      },
+      "comments fetched successfully"
+    )
+  );
 });
 
 const addComment = asyncHandler(async (req, res) => {

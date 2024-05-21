@@ -35,12 +35,10 @@ const videoSchema = new Schema(
       ref: "User",
       required: true,
     },
-    comments: [
-      {
-        type: Schema.Types.ObjectId,
-        ref: "Comments",
-      },
-    ],
+    likes: {
+      type: Number,
+      default: 0,
+    },
   },
   { timestamps: true }
 );

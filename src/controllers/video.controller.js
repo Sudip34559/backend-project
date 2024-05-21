@@ -9,7 +9,44 @@ import { v2 as cloudinary } from "cloudinary";
 
 const getAllVideos = asyncHandler(async (req, res) => {
   const { page = 1, limit = 10, query, sortBy, sortType, userId } = req.query;
-  //TODO: get all videos based on query, sort, pagination
+  const pageNumber = Number(page);
+  const limitNumber = Number(limit);
+  const skip = (pageNumber - 1) * limitNumber;
+  if (!isValidObjectId(userId)) {
+    throw new ApiError(400, "User Id is missing");
+  }
+  let filter = { owner: userId };
+  if (query) {
+    filter.title = { $regex: query, $options: "i" };
+  }
+  const videos = await Video.find(filter).limit(limitNumber).skip(skip);
+  const allVideos = await Video.find({ owner: userId });
+
+  if (!videos) {
+    throw new ApiError(400, "Videos does not exist");
+  }
+  if (sortBy && sortType) {
+    // Sort the videos array based on sortBy and sortType
+    videos.sort((a, b) => {
+      if (sortType === "asc") {
+        return a[sortBy] < b[sortBy] ? -1 : 1;
+      } else {
+        return a[sortBy] > b[sortBy] ? -1 : 1;
+      }
+    });
+  }
+  return res.status(200).json(
+    new ApiResponse(
+      200,
+      {
+        videos: videos,
+        totalVideos: allVideos.length,
+        totalPages: Math.ceil(allVideos.length / limitNumber),
+        currentPage: pageNumber,
+      },
+      "videos fetched successfully"
+    )
+  );
 });
 
 const publishAVideo = asyncHandler(async (req, res) => {
@@ -17,11 +54,10 @@ const publishAVideo = asyncHandler(async (req, res) => {
   if (!title || !description) {
     throw new ApiError(400, "Title and description must be provided");
   }
-  console.log(req.files);
 
   const videoFilePath = req.files?.videoFile[0].path;
   const thumbnailPath = req.files?.thumbnail[0].path;
-  console.log(videoFilePath, thumbnailPath);
+  // console.log(videoFilePath, thumbnailPath);
 
   if (!videoFilePath || !thumbnailPath) {
     throw new ApiError(400, "vedio and thumbnail must be provided");

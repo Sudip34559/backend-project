@@ -7,12 +7,14 @@ import {
   publishAVideo,
   updateVideo,
   togglePublishStatus,
+  getAllVideos,
 } from "../controllers/video.controller.js";
 
 const router = Router();
 
 router.use(verifyJWT); // Apply verifyJWT middleware to all routes in this file
 
+router.route("/").get(getAllVideos);
 router.route("/video-upload").post(
   upload.fields([
     { name: "videoFile", maxCount: 1 },
